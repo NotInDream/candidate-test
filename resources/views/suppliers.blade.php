@@ -47,8 +47,28 @@
                 </thead>
                 <tbody>
                     @forelse ($suppliers as $supplier)
+                        @php
+                            preg_match_all('/[A-Z]/', $supplier->name, $matches);
+                            $initials = implode('', array_slice($matches[0], 0, 2)) ?: strtoupper(substr($supplier->name, 0, 2));
+
+                            $palette = ['#3F7A5C', '#B45309', '#1D4ED8', '#9333EA', '#DB2777', '#0F766E', '#CA8A04', '#DC2626'];
+                            $bgColor = $palette[$supplier->id % count($palette)];
+                        @endphp
                         <tr class="h-[73px] border-t border-gray-200">
-                            <td class="px-[16px] font-medium text-gray-900">{{ $supplier->name }}</td>
+                            <td class="px-[16px] font-medium text-gray-900">
+                                <div class="flex items-center gap-[16px]">
+                                    {{-- Initials --}}
+                                    <div class="w-[40px] h-[40px] rounded-full font-bold text-white justify-center flex items-center"
+                                         style="background-color: {{ $bgColor }}">
+                                        <h1>{{ $initials }}</h1>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <h4 class="hover:text-green-800 duration-250 animate hover:cursor-pointer transition-all">{{ $supplier->name }}</h4>
+                                        <h3 class="text-gray-400">ID: {{ $supplier->id }}</h3>
+
+                                    </div>
+                                </div>
+                            </td>
                             <td class="px-[16px] text-gray-700">{{ $supplier->layups_count }}</td>
                             <td class="px-[16px] text-gray-700">{{ $supplier->created_at->format('Y-m-d') }}</td>
                             <td class="px-[16px] text-right">
