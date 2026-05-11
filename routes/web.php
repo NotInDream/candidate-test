@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Models\Suppliers;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -8,7 +9,9 @@ Route::get('/', function () {
 });
 
 Route::get('/suppliers', function () {
-    return view('suppliers');
+    $suppliers = Suppliers::withCount('layups')->latest()->paginate(5);
+
+    return view('suppliers', ['suppliers' => $suppliers]);
 })->middleware(['auth', 'verified'])->name('suppliers');
 
 Route::middleware('auth')->group(function () {

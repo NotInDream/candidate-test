@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('clt_layers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('layup_id');
-            $table->layer_order();
-            $table->thickness();
-            $table->width();
-            $table->angle();
+            $table->integer('layer_order');
+            $table->decimal('thickness');
+            $table->decimal('width');
+            $table->decimal('angle');
             $table->timestamps();
         });
     }
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('c_l_t__layers');
+        Schema::dropIfExists('clt_layers');
     }
 };

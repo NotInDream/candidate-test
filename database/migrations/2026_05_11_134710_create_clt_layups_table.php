@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('clt_layups', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('supplier_id');
-            $table->name();
+            $table->foreignId('supplier_id')->constrained('suppliers')->cascadeOnDelete();
+            $table->string('name');
             $table->timestamps();
         });
     }
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('c_l_t__layups');
+        Schema::dropIfExists('clt_layups');
     }
 };
