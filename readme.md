@@ -140,7 +140,6 @@ A design reference is available in Figma:
 The deadline will be provided via email.  
 Please ensure submission within the specified timeframe.
 
-
 ## 7. Demo
 
 Include one of the following with your submission:

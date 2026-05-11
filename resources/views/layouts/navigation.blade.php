@@ -1,25 +1,54 @@
 <nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
     <!-- Primary Navigation Menu -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="w-full px-[24px]">
         <div class="flex justify-between h-16">
-            <div class="flex">
+            <div class="flex gap-[32px]">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
+                    <a href="{{ route('suppliers') }}">
                         <x-application-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
                     </a>
                 </div>
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
+                    <x-nav-link :href="url('/overview')" :active="request()->is('overview')">
+                        {{ __('Overview') }}
+                    </x-nav-link>
+                    <x-nav-link :href="url('/suppliers')" :active="request()->is('suppliers*')">
+                        {{ __('Suppliers') }}
+                    </x-nav-link>
+                    <x-nav-link :href="url('/layups')" :active="request()->is('layups*')">
+                        {{ __('Layups') }}
+                    </x-nav-link>
+                    <x-nav-link :href="url('/layers')" :active="request()->is('layers*')">
+                        {{ __('Layers') }}
+                    </x-nav-link>
+                    <x-nav-link :href="url('/settings')" :active="request()->is('settings*')">
+                        {{ __('Settings') }}
                     </x-nav-link>
                 </div>
             </div>
 
+            {{-- Notifications and Profile --}}
+            <div class="flex items-center gap-[16px]">
+                <img src="{{ asset('assets/notification_icon.svg') }}" alt="" class="stroke-gray-300">
+                <div class="w-px h-[32px] bg-gray-300"></div>
+                <div class="flex items-center gap-[12px]">
+                    <div class="gap-[2.5px]">
+                        <div class="w-[32px] h-[32px] rounded-full bg-[#E5E7EB] items-center flex justify-center">
+                            <img src="{{ asset('assets/avatar_icon.svg') }}" alt="">
+                        </div>
+                    </div>
+                    <div class="flex flex-col">
+                        <h3 class="dark:text-gray-300 font-bold text-[12px]">{{ Auth::user()->name }}</h3>
+                        <h4 class="dark:text-gray-300 text-[10px]">Engineering Lead</h4>
+                    </div>
+                </div>
+            </div>
+
             <!-- Settings Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
+            {{-- <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
@@ -50,7 +79,7 @@
                         </form>
                     </x-slot>
                 </x-dropdown>
-            </div>
+            </div> --}}
 
             <!-- Hamburger -->
             <div class="-me-2 flex items-center sm:hidden">
@@ -67,8 +96,20 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
+            <x-responsive-nav-link :href="url('/overview')" :active="request()->is('overview')">
+                {{ __('Overview') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="url('/suppliers')" :active="request()->is('suppliers*')">
+                {{ __('Suppliers') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="url('/layups')" :active="request()->is('layups*')">
+                {{ __('Layups') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="url('/layers')" :active="request()->is('layers*')">
+                {{ __('Layers') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="url('/settings')" :active="request()->is('settings*')">
+                {{ __('Settings') }}
             </x-responsive-nav-link>
         </div>
 

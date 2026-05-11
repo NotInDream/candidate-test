@@ -29,7 +29,7 @@
                         <nav class="flex justify-end animate-fade-in">
                             @auth
                                 <a
-                                    href="{{ url('/dashboard') }}"
+                                    href="{{ url('/suppliers') }}"
                                     class="rounded-md px-3 py-2 ring-1 ring-transparent transition hover:text-gray-100 focus:outline-none focus-visible:ring-[#FF2D20] text-gray-200"
                                 >
                                     Dashboard
