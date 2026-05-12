@@ -56,10 +56,11 @@
                     <x-lucide-upload class="w-4 h-4" />
                     <h2 class="text-[14px] font-bold"> Import</h2>
                 </div>
-                <div class="bg-[#3F7A5C] py-[10px] px-[16px] flex items-center gap-2 rounded-[8px] text-gray-100">
+                <a href="{{ route('suppliers.export', $supplier) }}"
+                   class="bg-[#3F7A5C] py-[10px] px-[16px] flex items-center gap-2 rounded-[8px] text-gray-100 hover:bg-[#356a4f] transition-colors">
                     <x-lucide-download class="w-4 h-4" />
-                    <h2 class="text-[14px] font-bold"> Export</h2>
-                </div>
+                    <span class="text-[14px] font-bold"> Export</span>
+                </a>
                 <button type="button" x-data="" x-on:click="$dispatch('open-modal', 'add-layup')"
                     class="bg-[#3F7A5C] py-[10px] px-[16px] flex items-center gap-2 rounded-[8px] text-white hover:bg-[#356a4f] transition-colors">
                     <x-lucide-plus class="w-4 h-4" />
