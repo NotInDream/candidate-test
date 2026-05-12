@@ -32,7 +32,7 @@
 
         <div class="flex justify-end gap-[8px] mt-[20px]">
             <button type="button" x-on:click="$dispatch('close-modal', '{{ $name }}')"
-                    class="px-[16px] py-[8px] rounded-[8px] border border-gray-300 text-[14px] text-gray-700 hover:bg-gray-50">
+                    class="px-[16px] py-[8px] rounded-[8px] border border-gray-300 text-[14px] dark:text-gray-100 transition-all duration-250 hover:text-gray-700 hover:bg-gray-50">
                 {{ $cancelLabel }}
             </button>
             <button type="submit"

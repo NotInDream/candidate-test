@@ -9,7 +9,7 @@
 
         <button type="button" x-data="" x-on:click="$dispatch('open-modal', 'add-supplier')"
             class="bg-[#3F7A5C] py-[10px] px-[16px] flex items-center gap-2 rounded-[8px] text-white hover:bg-[#356a4f] transition-colors">
-            <img src="{{ asset('assets/plus_icon.svg') }}" alt="">
+            <x-lucide-plus class="w-4 h-4" />
             <span class="text-[14px] font-bold"> Add Supplier</span>
         </button>
     </div>
@@ -37,27 +37,7 @@
         </div>
     </x-form-modal>
 
-    <div class="p-[32px]">
-        {{-- Tools --}}
-        <div class="flex w-full justify-between">
-            <div class="flex w-[320px] h-[40px] gap-[13px] bg-white rounded-[8px]">
-                <div class="flex items-center justify-end w-[27px]">
-                    <img src="{{ asset('assets/search_icon.svg') }}" alt="" srcset="">
-                </div>
-                <input type="text" class="border-0 w-full rounded-r-[8px] p-0 focus:outline-none focus:ring-0 focus:border-0 " placeholder="Search suppliers by name...">
-            </div>
-            <div class="flex gap-[8px]">
-                <div class="flex h-[38px] bg-white rounded-[8px] border-[1px] py-[8px] px-[12px] items-center text-[14px] gap-[8px]">
-                    <img src="{{ asset("assets/filter_icon.svg") }}" alt="" class="w-[13.5px] h-[9px]">
-                    <h3>Filter</h3>
-                </div>
-                <div class="flex h-[38px] bg-white rounded-[8px] border-[1px] py-[8px] px-[12px] items-center text-[14px] gap-[4px]">
-                    <img src="{{ asset("assets/download_icon.svg") }}" alt="" class="w-[12px] h-[12px]">
-                    <h3>Export</h3>
-                </div>
-            </div>
-        </div>
-
+    <div class="px-[32px]">
         {{-- Table --}}
         <div class="w-full rounded-[8px] bg-white border border-gray-200 overflow-hidden mt-[16px]">
             <table class="w-full text-left text-[14px]">
@@ -100,14 +80,12 @@
                                     <button type="button" x-data=""
                                             x-on:click="$dispatch('open-modal', 'edit-supplier-{{ $supplier->id }}')"
                                             class="p-[6px] rounded-[6px] hover:bg-gray-100" title="Edit">
-                                        <img src="{{ asset('assets/edit_icon.svg') }}" alt="Edit" class="w-[16px] h-[16px]">
+                                        <x-lucide-pencil class="w-4 h-4 text-gray-700" />
                                     </button>
                                     <button type="button" x-data=""
                                             x-on:click="$dispatch('open-modal', 'delete-supplier-{{ $supplier->id }}')"
                                             class="p-[6px] rounded-[6px] hover:bg-red-50" title="Delete">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-[16px] h-[16px] text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3" />
-                                        </svg>
+                                        <x-lucide-trash-2 class="w-4 h-4 text-red-600" />
                                     </button>
                                 </div>
 
@@ -136,14 +114,14 @@
                                     <form method="POST" action="{{ route('suppliers.destroy', $supplier) }}" class="p-[24px] text-left">
                                         @csrf
                                         @method('DELETE')
-                                        <h2 class="text-[18px] font-bold text-gray-900">Delete supplier?</h2>
-                                        <p class="mt-[8px] text-[14px] text-gray-600">
+                                        <h2 class="text-[18px] font-bold dark:text-gray-100">Delete supplier?</h2>
+                                        <p class="mt-[8px] text-[14px] dark:text-gray-200">
                                             This will permanently delete <span class="font-semibold">{{ $supplier->name }}</span>
                                             and all associated layups and layers. This cannot be undone.
                                         </p>
                                         <div class="flex justify-end gap-[8px] mt-[20px]">
                                             <button type="button" x-on:click="$dispatch('close-modal', 'delete-supplier-{{ $supplier->id }}')"
-                                                    class="px-[16px] py-[8px] rounded-[8px] border border-gray-300 text-[14px] text-gray-700 hover:bg-gray-50">
+                                                    class="px-[16px] py-[8px] rounded-[8px] border border-gray-300 text-[14px] dark:text-gray-100 hover:bg-gray-50 hover:border-gray-400 hover:text-gray-700 transition-all duration-250">
                                                 Cancel
                                             </button>
                                             <button type="submit"

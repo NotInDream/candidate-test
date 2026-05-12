@@ -27,7 +27,7 @@
 
             <button type="button" x-data="" x-on:click="$dispatch('open-modal', 'edit-layup')"
                 class="bg-[#3F7A5C] py-[10px] px-[16px] flex items-center gap-2 rounded-[8px] text-white hover:bg-[#356a4f] transition-colors">
-                <img src="{{ asset('assets/edit_icon.svg') }}" alt="">
+                <x-lucide-pencil class="w-4 h-4" />
                 <span class="text-[14px] font-bold"> Edit Layup</span>
             </button>
         </div>
@@ -51,25 +51,25 @@
             </div>
         </x-form-modal>
 
-        <div class="flex justify-between items-center w-full p-[24px] my-[16px] rounded-[8px] dark:text-gray-100 bg-gray-800">
+        {{-- <div class="flex justify-between items-center w-full p-[24px] my-[16px] rounded-[8px] dark:text-gray-100 bg-gray-800">
             <h1>Layer composition</h1>
 
             <div class="flex gap-[8px]">
-                <div class="bg-[#3F7A5C] py-[10px] px-[16px] flex items-center gap-2 rounded-[8px]">
-                    <img src="{{ asset('assets/edit_icon.svg') }}" alt="">
+                <div class="bg-[#3F7A5C] py-[10px] px-[16px] flex items-center gap-2 rounded-[8px] text-gray-100">
+                    <x-lucide-upload class="w-4 h-4" />
                     <h2 class="text-[14px] font-bold"> Import</h2>
                 </div>
-                <div class="bg-[#3F7A5C] py-[10px] px-[16px] flex items-center gap-2 rounded-[8px]">
-                    <img src="{{ asset('assets/edit_icon.svg') }}" alt="">
+                <div class="bg-[#3F7A5C] py-[10px] px-[16px] flex items-center gap-2 rounded-[8px] text-gray-100">
+                    <x-lucide-download class="w-4 h-4" />
                     <h2 class="text-[14px] font-bold"> Export</h2>
                 </div>
                 <button type="button" x-data="" x-on:click="$dispatch('open-modal', 'add-layer')"
                     class="bg-[#3F7A5C] py-[10px] px-[16px] flex items-center gap-2 rounded-[8px] text-white hover:bg-[#356a4f] transition-colors">
-                    <img src="{{ asset('assets/plus_icon.svg') }}" alt="">
+                    <x-lucide-plus class="w-4 h-4" />
                     <span class="text-[14px] font-bold"> Add Layer</span>
                 </button>
             </div>
-        </div>
+        </div> --}}
 
         @if (session('status'))
             <div class="mb-[16px] px-[16px] py-[10px] rounded-[8px] bg-green-100 text-green-800 text-[14px]">
@@ -143,14 +143,12 @@
                                     <button type="button" x-data=""
                                             x-on:click="$dispatch('open-modal', 'edit-layer-{{ $layer->id }}')"
                                             class="p-[6px] rounded-[6px] hover:bg-gray-100" title="Edit">
-                                        <img src="{{ asset('assets/edit_icon.svg') }}" alt="Edit" class="w-[16px] h-[16px]">
+                                        <x-lucide-pencil class="w-4 h-4 text-gray-700" />
                                     </button>
                                     <button type="button" x-data=""
                                             x-on:click="$dispatch('open-modal', 'delete-layer-{{ $layer->id }}')"
                                             class="p-[6px] rounded-[6px] hover:bg-red-50" title="Delete">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-[16px] h-[16px] text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3" />
-                                        </svg>
+                                        <x-lucide-trash-2 class="w-4 h-4 text-red-600" />
                                     </button>
                                 </div>
 

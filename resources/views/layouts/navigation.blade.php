@@ -32,7 +32,7 @@
 
             {{-- Notifications and Profile --}}
             <div class="flex items-center gap-[16px]">
-                <img src="{{ asset('assets/notification_icon.svg') }}" alt="" class="stroke-gray-300">
+                <x-lucide-bell class="stroke-gray-100 w-5 h-5"/>
                 <div class="w-px h-[32px] bg-gray-300"></div>
                 <div class="flex items-center gap-[12px]">
                     <div class="gap-[2.5px]">
