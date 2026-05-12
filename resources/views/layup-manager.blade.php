@@ -161,7 +161,9 @@
                                 </x-form-modal>
 
                                 <x-modal name="delete-layup-{{ $layup->id }}" :show="false" focusable maxWidth="md">
-                                    <form method="POST" action="{{ route('layups.destroy', $layup) }}" class="p-[24px] text-left">
+                                    <form method="POST" action="{{ route('layups.destroy', $layup) }}" class="p-[24px] text-left"
+                                          x-data="{ submitting: false }"
+                                          x-on:submit="submitting = true">
                                         @csrf
                                         @method('DELETE')
                                         <h2 class="text-[18px] font-bold dark:text-gray-100">Delete layup?</h2>
@@ -171,12 +173,14 @@
                                         </p>
                                         <div class="flex justify-end gap-[8px] mt-[20px]">
                                             <button type="button" x-on:click="$dispatch('close-modal', 'delete-layup-{{ $layup->id }}')"
-                                                    class="px-[16px] py-[8px] rounded-[8px] border border-gray-300 text-[14px] dark:text-gray-100 hover:bg-gray-50 hover:text-gray-700 transition-all duration-250">
+                                                    :disabled="submitting"
+                                                    class="px-[16px] py-[8px] rounded-[8px] border border-gray-300 text-[14px] dark:text-gray-100 hover:bg-gray-50 hover:text-gray-700 transition-all duration-250 disabled:opacity-50 disabled:cursor-not-allowed">
                                                 Cancel
                                             </button>
                                             <button type="submit"
-                                                    class="px-[16px] py-[8px] rounded-[8px] bg-red-600 text-white text-[14px] font-bold hover:bg-red-700">
-                                                Delete
+                                                    :disabled="submitting"
+                                                    class="px-[16px] py-[8px] rounded-[8px] bg-red-600 text-white text-[14px] font-bold hover:bg-red-700 disabled:opacity-60 disabled:cursor-not-allowed">
+                                                <span x-text="submitting ? 'Deleting…' : 'Delete'">Delete</span>
                                             </button>
                                         </div>
                                     </form>

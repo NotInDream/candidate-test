@@ -51,26 +51,6 @@
             </div>
         </x-form-modal>
 
-        {{-- <div class="flex justify-between items-center w-full p-[24px] my-[16px] rounded-[8px] dark:text-gray-100 bg-gray-800">
-            <h1>Layer composition</h1>
-
-            <div class="flex gap-[8px]">
-                <div class="bg-[#3F7A5C] py-[10px] px-[16px] flex items-center gap-2 rounded-[8px] text-gray-100">
-                    <x-lucide-upload class="w-4 h-4" />
-                    <h2 class="text-[14px] font-bold"> Import</h2>
-                </div>
-                <div class="bg-[#3F7A5C] py-[10px] px-[16px] flex items-center gap-2 rounded-[8px] text-gray-100">
-                    <x-lucide-download class="w-4 h-4" />
-                    <h2 class="text-[14px] font-bold"> Export</h2>
-                </div>
-                <button type="button" x-data="" x-on:click="$dispatch('open-modal', 'add-layer')"
-                    class="bg-[#3F7A5C] py-[10px] px-[16px] flex items-center gap-2 rounded-[8px] text-white hover:bg-[#356a4f] transition-colors">
-                    <x-lucide-plus class="w-4 h-4" />
-                    <span class="text-[14px] font-bold"> Add Layer</span>
-                </button>
-            </div>
-        </div> --}}
-
         @if (session('status'))
             <div class="mb-[16px] px-[16px] py-[10px] rounded-[8px] bg-green-100 text-green-800 text-[14px]">
                 {{ session('status') }}
@@ -194,7 +174,9 @@
                                 </x-form-modal>
 
                                 <x-modal name="delete-layer-{{ $layer->id }}" :show="false" focusable maxWidth="md">
-                                    <form method="POST" action="{{ route('layers.destroy', $layer) }}" class="p-[24px] text-left">
+                                    <form method="POST" action="{{ route('layers.destroy', $layer) }}" class="p-[24px] text-left"
+                                          x-data="{ submitting: false }"
+                                          x-on:submit="submitting = true">
                                         @csrf
                                         @method('DELETE')
                                         <h2 class="text-[18px] font-bold text-gray-900">Delete layer?</h2>
@@ -205,12 +187,14 @@
                                         </p>
                                         <div class="flex justify-end gap-[8px] mt-[20px]">
                                             <button type="button" x-on:click="$dispatch('close-modal', 'delete-layer-{{ $layer->id }}')"
-                                                    class="px-[16px] py-[8px] rounded-[8px] border border-gray-300 text-[14px] text-gray-700 hover:bg-gray-50">
+                                                    :disabled="submitting"
+                                                    class="px-[16px] py-[8px] rounded-[8px] border border-gray-300 text-[14px] text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                                                 Cancel
                                             </button>
                                             <button type="submit"
-                                                    class="px-[16px] py-[8px] rounded-[8px] bg-red-600 text-white text-[14px] font-bold hover:bg-red-700">
-                                                Delete
+                                                    :disabled="submitting"
+                                                    class="px-[16px] py-[8px] rounded-[8px] bg-red-600 text-white text-[14px] font-bold hover:bg-red-700 disabled:opacity-60 disabled:cursor-not-allowed">
+                                                <span x-text="submitting ? 'Deleting…' : 'Delete'">Delete</span>
                                             </button>
                                         </div>
                                     </form>
