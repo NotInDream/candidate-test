@@ -7,11 +7,35 @@
             <h2 class="text-size[14px]">Manage timber suppliers and material sourcing.</h2>
         </div>
 
-        <div class="bg-[#3F7A5C] py-[10px] px-[16px] flex items-center gap-2 rounded-[8px]">
+        <button type="button" x-data="" x-on:click="$dispatch('open-modal', 'add-supplier')"
+            class="bg-[#3F7A5C] py-[10px] px-[16px] flex items-center gap-2 rounded-[8px] text-white hover:bg-[#356a4f] transition-colors">
             <img src="{{ asset('assets/plus_icon.svg') }}" alt="">
-            <h2 class="text-[14px] font-bold"> Add Supplier</h2>
-        </div>
+            <span class="text-[14px] font-bold"> Add Supplier</span>
+        </button>
     </div>
+
+    @if (session('status'))
+        <div class="mx-[32px] mb-[16px] px-[16px] py-[10px] rounded-[8px] bg-green-100 text-green-800 text-[14px]">
+            {{ session('status') }}
+        </div>
+    @endif
+
+    <x-form-modal
+        name="add-supplier"
+        title="Add Supplier"
+        :action="route('suppliers.store')"
+        submit-label="Create"
+        :show="$errors->any()"
+    >
+        <div>
+            <x-input-label for="name" value="Name" />
+            <x-text-input id="name" name="name" type="text"
+                          class="mt-1 block w-full"
+                          :value="old('name')"
+                          required autofocus placeholder="Supplier name" />
+            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+        </div>
+    </x-form-modal>
 
     <div class="p-[32px]">
         {{-- Tools --}}
@@ -72,7 +96,63 @@
                             <td class="px-[16px] text-gray-700">{{ $supplier->layups_count }}</td>
                             <td class="px-[16px] text-gray-700">{{ $supplier->created_at->format('Y-m-d') }}</td>
                             <td class="px-[16px] text-right">
+                                <div class="flex justify-end gap-[8px]">
+                                    <button type="button" x-data=""
+                                            x-on:click="$dispatch('open-modal', 'edit-supplier-{{ $supplier->id }}')"
+                                            class="p-[6px] rounded-[6px] hover:bg-gray-100" title="Edit">
+                                        <img src="{{ asset('assets/edit_icon.svg') }}" alt="Edit" class="w-[16px] h-[16px]">
+                                    </button>
+                                    <button type="button" x-data=""
+                                            x-on:click="$dispatch('open-modal', 'delete-supplier-{{ $supplier->id }}')"
+                                            class="p-[6px] rounded-[6px] hover:bg-red-50" title="Delete">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-[16px] h-[16px] text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3" />
+                                        </svg>
+                                    </button>
+                                </div>
 
+                                {{-- Edit modal --}}
+                                <x-form-modal
+                                    name="edit-supplier-{{ $supplier->id }}"
+                                    title="Edit Supplier"
+                                    :action="route('suppliers.update', $supplier)"
+                                    method="PATCH"
+                                    submit-label="Save"
+                                    :show="$errors->any() && (int) old('_supplier_id') === $supplier->id"
+                                >
+                                    <input type="hidden" name="_supplier_id" value="{{ $supplier->id }}">
+                                    <div class="text-left">
+                                        <x-input-label for="name-{{ $supplier->id }}" value="Name" />
+                                        <x-text-input id="name-{{ $supplier->id }}" name="name" type="text"
+                                                      class="mt-1 block w-full"
+                                                      :value="old('name', $supplier->name)"
+                                                      required />
+                                        <x-input-error :messages="$errors->get('name')" class="mt-2" />
+                                    </div>
+                                </x-form-modal>
+
+                                {{-- Delete confirm modal --}}
+                                <x-modal name="delete-supplier-{{ $supplier->id }}" :show="false" focusable maxWidth="md">
+                                    <form method="POST" action="{{ route('suppliers.destroy', $supplier) }}" class="p-[24px] text-left">
+                                        @csrf
+                                        @method('DELETE')
+                                        <h2 class="text-[18px] font-bold text-gray-900">Delete supplier?</h2>
+                                        <p class="mt-[8px] text-[14px] text-gray-600">
+                                            This will permanently delete <span class="font-semibold">{{ $supplier->name }}</span>
+                                            and all associated layups and layers. This cannot be undone.
+                                        </p>
+                                        <div class="flex justify-end gap-[8px] mt-[20px]">
+                                            <button type="button" x-on:click="$dispatch('close-modal', 'delete-supplier-{{ $supplier->id }}')"
+                                                    class="px-[16px] py-[8px] rounded-[8px] border border-gray-300 text-[14px] text-gray-700 hover:bg-gray-50">
+                                                Cancel
+                                            </button>
+                                            <button type="submit"
+                                                    class="px-[16px] py-[8px] rounded-[8px] bg-red-600 text-white text-[14px] font-bold hover:bg-red-700">
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </form>
+                                </x-modal>
                             </td>
                         </tr>
                     @empty

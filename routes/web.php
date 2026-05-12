@@ -1,27 +1,20 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use App\Models\Suppliers;
+use App\Http\Controllers\SupplierController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/suppliers', function () {
-    $suppliers = Suppliers::withCount('layups')->latest()->paginate(5);
-
-    return view('suppliers', ['suppliers' => $suppliers]);
-})->middleware(['auth', 'verified'])->name('suppliers');
-
-Route::get('/suppliers/{supplier}', function (Suppliers $supplier) {
-    $layups = $supplier->layups()->latest()->paginate(5);
-
-    return view('layup-manager', [
-        'supplier' => $supplier,
-        'layups'   => $layups,
-    ]);
-})->middleware(['auth', 'verified'])->name('suppliers.show');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/suppliers', [SupplierController::class, 'index'])->name('suppliers.index');
+    Route::post('/suppliers', [SupplierController::class, 'store'])->name('suppliers.store');
+    Route::get('/suppliers/{supplier}', [SupplierController::class, 'show'])->name('suppliers.show');
+    Route::patch('/suppliers/{supplier}', [SupplierController::class, 'update'])->name('suppliers.update');
+    Route::delete('/suppliers/{supplier}', [SupplierController::class, 'destroy'])->name('suppliers.destroy');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

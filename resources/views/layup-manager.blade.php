@@ -2,7 +2,7 @@
     <div class="flex flex-col  w-full p-[32px] dark:text-gray-100">
         {{-- Breadcrumbs --}}
         <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-[14px]">
-            <a href="{{ route('suppliers') }}"
+            <a href="{{ route('suppliers.index') }}"
                class="font-medium text-gray-500 hover:text-[#3F7A5C] hover:cursor-pointer transition-colors duration-300">
                 Suppliers
             </a>
