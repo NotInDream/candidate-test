@@ -63,8 +63,8 @@
                                         <h1>{{ $initials }}</h1>
                                     </div>
                                     <div class="flex flex-col">
-                                        <h4 class="hover:text-green-800 duration-250 animate hover:cursor-pointer transition-all">{{ $supplier->name }}</h4>
-                                        <h3 class="text-gray-400">ID: {{ $supplier->id }}</h3>
+                                        <a href="{{ route('suppliers.show', $supplier) }}" class="hover:text-green-800 hover:cursor-pointer transition-colors duration-300">{{ $supplier->name }}</a>
+                                        <h3 class="text-gray-400 font-mono">ID: {{ $supplier->id }}</h3>
 
                                     </div>
                                 </div>

@@ -14,6 +14,15 @@ Route::get('/suppliers', function () {
     return view('suppliers', ['suppliers' => $suppliers]);
 })->middleware(['auth', 'verified'])->name('suppliers');
 
+Route::get('/suppliers/{supplier}', function (Suppliers $supplier) {
+    $layups = $supplier->layups()->latest()->paginate(5);
+
+    return view('layup-manager', [
+        'supplier' => $supplier,
+        'layups'   => $layups,
+    ]);
+})->middleware(['auth', 'verified'])->name('suppliers.show');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
