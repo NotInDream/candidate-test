@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\LayerController;
+use App\Http\Controllers\LayupController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SupplierController;
 use Illuminate\Support\Facades\Route;
@@ -14,6 +16,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/suppliers/{supplier}', [SupplierController::class, 'show'])->name('suppliers.show');
     Route::patch('/suppliers/{supplier}', [SupplierController::class, 'update'])->name('suppliers.update');
     Route::delete('/suppliers/{supplier}', [SupplierController::class, 'destroy'])->name('suppliers.destroy');
+
+    Route::post('/suppliers/{supplier}/layups', [LayupController::class, 'store'])->name('layups.store');
+    Route::get('/suppliers/{supplier}/layups/{layup}', [LayupController::class, 'show'])->scopeBindings()->name('layups.show');
+    Route::patch('/layups/{layup}', [LayupController::class, 'update'])->name('layups.update');
+    Route::delete('/layups/{layup}', [LayupController::class, 'destroy'])->name('layups.destroy');
+
+    Route::post('/suppliers/{supplier}/layups/{layup}/layers', [LayerController::class, 'store'])
+        ->scopeBindings()->name('layers.store');
+    Route::patch('/layers/{layer}', [LayerController::class, 'update'])->name('layers.update');
+    Route::delete('/layers/{layer}', [LayerController::class, 'destroy'])->name('layers.destroy');
 });
 
 Route::middleware('auth')->group(function () {

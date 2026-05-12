@@ -22,11 +22,31 @@
                 <h2 class="text-size[14px] font-mono">ID: {{ $supplier->id }} </h2>
             </div>
 
-            <div class="bg-[#3F7A5C] py-[10px] px-[16px] flex items-center gap-2 rounded-[8px]">
+            <button type="button" x-data="" x-on:click="$dispatch('open-modal', 'edit-supplier')"
+                class="bg-[#3F7A5C] py-[10px] px-[16px] flex items-center gap-2 rounded-[8px] text-white hover:bg-[#356a4f] transition-colors">
                 <img src="{{ asset('assets/edit_icon.svg') }}" alt="">
-                <h2 class="text-[14px] font-bold"> Edit Supplier</h2>
-            </div>
+                <span class="text-[14px] font-bold"> Edit Supplier</span>
+            </button>
         </div>
+
+        <x-form-modal
+            name="edit-supplier"
+            title="Edit Supplier"
+            :action="route('suppliers.update', $supplier)"
+            method="PATCH"
+            submit-label="Save"
+            :show="$errors->any() && old('_supplier_id') !== null"
+        >
+            <input type="hidden" name="_supplier_id" value="{{ $supplier->id }}">
+            <div class="text-left">
+                <x-input-label for="supplier-name" value="Name" />
+                <x-text-input id="supplier-name" name="name" type="text"
+                              class="mt-1 block w-full"
+                              :value="old('name', $supplier->name)"
+                              required />
+                <x-input-error :messages="$errors->get('name')" class="mt-2" />
+            </div>
+        </x-form-modal>
 
         <div class="flex justify-between items-center w-full p-[24px] my-[16px] rounded-[8px] dark:text-gray-100 bg-gray-800">
             <h1>Associated Layups</h1>
@@ -40,12 +60,36 @@
                     <img src="{{ asset('assets/edit_icon.svg') }}" alt="">
                     <h2 class="text-[14px] font-bold"> Export</h2>
                 </div>
-                <div class="bg-[#3F7A5C] py-[10px] px-[16px] flex items-center gap-2 rounded-[8px]">
+                <button type="button" x-data="" x-on:click="$dispatch('open-modal', 'add-layup')"
+                    class="bg-[#3F7A5C] py-[10px] px-[16px] flex items-center gap-2 rounded-[8px] text-white hover:bg-[#356a4f] transition-colors">
                     <img src="{{ asset('assets/plus_icon.svg') }}" alt="">
-                    <h2 class="text-[14px] font-bold"> Add Layup</h2>
-                </div>
+                    <span class="text-[14px] font-bold"> Add Layup</span>
+                </button>
             </div>
         </div>
+
+        @if (session('status'))
+            <div class="mb-[16px] px-[16px] py-[10px] rounded-[8px] bg-green-100 text-green-800 text-[14px]">
+                {{ session('status') }}
+            </div>
+        @endif
+
+        <x-form-modal
+            name="add-layup"
+            title="Add Layup"
+            :action="route('layups.store', $supplier)"
+            submit-label="Create"
+            :show="$errors->any() && !old('_layup_id')"
+        >
+            <div class="text-left">
+                <x-input-label for="layup-name" value="Name" />
+                <x-text-input id="layup-name" name="name" type="text"
+                              class="mt-1 block w-full"
+                              :value="old('name')"
+                              required autofocus placeholder="Layup name" />
+                <x-input-error :messages="$errors->get('name')" class="mt-2" />
+            </div>
+        </x-form-modal>
 
         <div class="w-full rounded-[8px] bg-white border border-gray-200 overflow-hidden mt-[16px]">
             <table class="w-full text-left text-[14px]">
@@ -71,13 +115,74 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-[16px] text-gray-700">{{ $layup->name }}</td>
+                            <td class="px-[16px] text-gray-700">
+                                <a href="{{ route('layups.show', [$supplier, $layup]) }}"
+                                   class="hover:text-green-800 hover:cursor-pointer transition-colors duration-300">
+                                    {{ $layup->name }}
+                                </a>
+                            </td>
+                            <td class="px-[16px] text-gray-700">{{ $layup->layers_thickness_sum ?? 0 }}mm</td>
+                            <td class="px-[16px] text-gray-700">{{ $layup->layers_count }}</td>
                             <td class="px-[16px] text-gray-700"></td>
-                            <td class="px-[16px] "></td>
-                            <td class="px-[16px] "></td>
-                            <td class="px-[16px] "></td>
-                            <td class="px-[16px] "></td>
-                            <td class="px-[16px] text-right"></td>
+                            <td class="px-[16px] text-gray-700 "></td>
+                            <td class="px-[16px] text-gray-700 "></td>
+                            <td class="px-[16px] text-right">
+                                <div class="flex justify-end gap-[8px]">
+                                    <button type="button" x-data=""
+                                            x-on:click="$dispatch('open-modal', 'edit-layup-{{ $layup->id }}')"
+                                            class="p-[6px] rounded-[6px] hover:bg-gray-100" title="Edit">
+                                        <img src="{{ asset('assets/edit_icon.svg') }}" alt="Edit" class="w-[16px] h-[16px]">
+                                    </button>
+                                    <button type="button" x-data=""
+                                            x-on:click="$dispatch('open-modal', 'delete-layup-{{ $layup->id }}')"
+                                            class="p-[6px] rounded-[6px] hover:bg-red-50" title="Delete">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-[16px] h-[16px] text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3" />
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                <x-form-modal
+                                    name="edit-layup-{{ $layup->id }}"
+                                    title="Edit Layup"
+                                    :action="route('layups.update', $layup)"
+                                    method="PATCH"
+                                    submit-label="Save"
+                                    :show="$errors->any() && (int) old('_layup_id') === $layup->id"
+                                >
+                                    <input type="hidden" name="_layup_id" value="{{ $layup->id }}">
+                                    <div class="text-left">
+                                        <x-input-label for="layup-name-{{ $layup->id }}" value="Name" />
+                                        <x-text-input id="layup-name-{{ $layup->id }}" name="name" type="text"
+                                                      class="mt-1 block w-full"
+                                                      :value="old('name', $layup->name)"
+                                                      required />
+                                        <x-input-error :messages="$errors->get('name')" class="mt-2" />
+                                    </div>
+                                </x-form-modal>
+
+                                <x-modal name="delete-layup-{{ $layup->id }}" :show="false" focusable maxWidth="md">
+                                    <form method="POST" action="{{ route('layups.destroy', $layup) }}" class="p-[24px] text-left">
+                                        @csrf
+                                        @method('DELETE')
+                                        <h2 class="text-[18px] font-bold text-gray-900">Delete layup?</h2>
+                                        <p class="mt-[8px] text-[14px] text-gray-600">
+                                            This will permanently delete <span class="font-semibold">{{ $layup->name }}</span>
+                                            and all associated layers. This cannot be undone.
+                                        </p>
+                                        <div class="flex justify-end gap-[8px] mt-[20px]">
+                                            <button type="button" x-on:click="$dispatch('close-modal', 'delete-layup-{{ $layup->id }}')"
+                                                    class="px-[16px] py-[8px] rounded-[8px] border border-gray-300 text-[14px] text-gray-700 hover:bg-gray-50">
+                                                Cancel
+                                            </button>
+                                            <button type="submit"
+                                                    class="px-[16px] py-[8px] rounded-[8px] bg-red-600 text-white text-[14px] font-bold hover:bg-red-700">
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </form>
+                                </x-modal>
+                            </td>
                         </tr>
                     @empty
                         <tr class="h-[73px] border-t border-gray-200">

@@ -21,6 +21,9 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call([
+            SupplierSeeder::class,
+            CLT_LayupsSeeder::class,
+            CLT_LayerSeeder::class
         ]);
     }
 }

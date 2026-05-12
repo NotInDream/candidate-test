@@ -19,7 +19,11 @@ class SupplierController extends Controller
 
     public function show(Suppliers $supplier): View
     {
-        $layups = $supplier->layups()->latest()->paginate(5);
+        $layups = $supplier->layups()
+            ->withCount('layers')
+            ->withSum('layers as layers_thickness_sum', 'thickness')
+            ->latest()
+            ->paginate(5);
 
         return view('layup-manager', [
             'supplier' => $supplier,
@@ -41,7 +45,7 @@ class SupplierController extends Controller
         $supplier->update($request->validated());
 
         return redirect()
-            ->route('suppliers.index')
+            ->back()
             ->with('status', 'Supplier updated.');
     }
 
