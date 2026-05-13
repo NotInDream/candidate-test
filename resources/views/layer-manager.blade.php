@@ -51,6 +51,16 @@
             </div>
         </x-form-modal>
 
+        <div class="flex justify-between items-center w-full p-[24px] my-[16px] rounded-[8px] dark:text-gray-100 bg-gray-800">
+            <h1>Associated Layers</h1>
+
+            <button type="button" x-data="" x-on:click="$dispatch('open-modal', 'add-layer')"
+                class="bg-[#3F7A5C] py-[10px] px-[16px] flex items-center gap-2 rounded-[8px] text-white hover:bg-[#356a4f] transition-colors">
+                <x-lucide-plus class="w-4 h-4" />
+                <span class="text-[14px] font-bold"> Add Layer</span>
+            </button>
+        </div>
+
         @if (session('status'))
             <div class="mb-[16px] px-[16px] py-[10px] rounded-[8px] bg-green-100 text-green-800 text-[14px]">
                 {{ session('status') }}
@@ -85,7 +95,7 @@
                 </div>
                 <div>
                     <x-input-label for="layer-angle" value="Angle (°)" />
-                    <x-text-input id="layer-angle" name="angle" type="number"
+                    <x-text-input id="layer-angle" name="angle" type="number" step="0.01"
                                   class="mt-1 block w-full" :value="old('angle')" required />
                     <x-input-error :messages="$errors->get('angle')" class="mt-2" />
                 </div>
@@ -100,7 +110,6 @@
                         <th class="px-[16px] py-[12px] font-semibold">Thickness</th>
                         <th class="px-[16px] py-[12px] font-semibold">Width</th>
                         <th class="px-[16px] py-[12px] font-semibold">Angle</th>
-                        <th class="px-[16px] py-[12px] font-semibold">Grade</th>
                         <th class="px-[16px] py-[12px] font-semibold text-right">Actions</th>
                     </tr>
                 </thead>
@@ -117,7 +126,6 @@
                             <td class="px-[16px] text-gray-700">{{ $layer->thickness }}</td>
                             <td class="px-[16px] text-gray-700">{{ $layer->width }}</td>
                             <td class="px-[16px] text-gray-700">{{ $layer->angle }}</td>
-                            <td class="px-[16px] text-gray-700">C12</td>
                             <td class="px-[16px] text-right">
                                 <div class="flex justify-end gap-[8px]">
                                     <button type="button" x-data=""
@@ -151,21 +159,21 @@
                                         </div>
                                         <div>
                                             <x-input-label :for="'layer-thickness-' . $layer->id" value="Thickness" />
-                                            <x-text-input :id="'layer-thickness-' . $layer->id" name="thickness" type="number"
+                                            <x-text-input :id="'layer-thickness-' . $layer->id" name="thickness" type="number" step="0.01"
                                                           class="mt-1 block w-full"
                                                           :value="old('thickness', $layer->thickness)" required />
                                             <x-input-error :messages="$errors->get('thickness')" class="mt-2" />
                                         </div>
                                         <div>
                                             <x-input-label :for="'layer-width-' . $layer->id" value="Width" />
-                                            <x-text-input :id="'layer-width-' . $layer->id" name="width" type="number"
+                                            <x-text-input :id="'layer-width-' . $layer->id" name="width" type="number" step="0.01"
                                                           class="mt-1 block w-full"
                                                           :value="old('width', $layer->width)" required />
                                             <x-input-error :messages="$errors->get('width')" class="mt-2" />
                                         </div>
                                         <div>
                                             <x-input-label :for="'layer-angle-' . $layer->id" value="Angle" />
-                                            <x-text-input :id="'layer-angle-' . $layer->id" name="angle" type="number"
+                                            <x-text-input :id="'layer-angle-' . $layer->id" name="angle" type="number" step="0.01"
                                                           class="mt-1 block w-full"
                                                           :value="old('angle', $layer->angle)" required />
                                             <x-input-error :messages="$errors->get('angle')" class="mt-2" />

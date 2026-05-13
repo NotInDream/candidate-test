@@ -30,7 +30,7 @@ class UpdateLayerRequest extends FormRequest
             ],
             'thickness' => ['required', 'numeric', 'min:0'],
             'width'     => ['required', 'numeric', 'min:0'],
-            'angle'     => ['required', 'integer', 'between:-180,180'],
+            'angle'     => ['required', 'numeric', 'between:-180,180'],
         ];
     }
 }
