@@ -51,16 +51,6 @@
             </div>
         </x-form-modal>
 
-        <div class="flex justify-between items-center w-full p-[24px] my-[16px] rounded-[8px] dark:text-gray-100 bg-gray-800">
-            <h1>Associated Layers</h1>
-
-            <button type="button" x-data="" x-on:click="$dispatch('open-modal', 'add-layer')"
-                class="bg-[#3F7A5C] py-[10px] px-[16px] flex items-center gap-2 rounded-[8px] text-white hover:bg-[#356a4f] transition-colors">
-                <x-lucide-plus class="w-4 h-4" />
-                <span class="text-[14px] font-bold"> Add Layer</span>
-            </button>
-        </div>
-
         @if (session('status'))
             <div class="mb-[16px] px-[16px] py-[10px] rounded-[8px] bg-green-100 text-green-800 text-[14px]">
                 {{ session('status') }}
@@ -102,7 +92,79 @@
             </div>
         </x-form-modal>
 
-        <div class="w-full rounded-[8px] bg-white border border-gray-200 overflow-hidden mt-[16px]">
+        <div class="flex gap-[16px] items-start mt-[16px]">
+        {{-- Structure Visualizer --}}
+        <div class="flex-1 min-w-0 rounded-[8px] bg-white border border-gray-200 p-[20px] order-2">
+            <div class="flex justify-between items-center mb-[12px]">
+                <h2 class="font-bold text-[16px] text-gray-900">Structure Visualizer</h2>
+                <div class="flex items-center gap-[16px] text-[12px] text-gray-600">
+                    <div class="flex items-center gap-[6px]">
+                        <span class="inline-block w-[12px] h-[12px] rounded-full" style="background-color:#E8C9A0"></span>
+                        Longitudinal (0°)
+                    </div>
+                    <div class="flex items-center gap-[6px]">
+                        <span class="inline-block w-[12px] h-[12px] rounded-full" style="background-color:#B8824A"></span>
+                        Transverse (90°)
+                    </div>
+                </div>
+            </div>
+
+            @if ($layers->isEmpty())
+                <p class="text-center text-gray-500 text-[13px] py-[24px]">No layers to visualize yet.</p>
+            @else
+                @php
+                    $maxThickness = max($layers->max('thickness'), 1);
+                    $maxWidth     = max($layers->max('width'), 1);
+                @endphp
+                <div class="flex gap-[16px]">
+                    {{-- Side labels --}}
+                    <div class="flex flex-col justify-between text-[10px] font-bold text-gray-500 tracking-wider py-[8px] w-[64px] shrink-0">
+                        <div>
+                            <div>TOP</div>
+                            <div class="text-gray-400">(OUTSIDE)</div>
+                        </div>
+                        <div>
+                            <div>BOTTOM</div>
+                            <div class="text-gray-400">(INSIDE)</div>
+                        </div>
+                    </div>
+
+                    {{-- Stack --}}
+                    <div class="flex-1 bg-gray-50 rounded-[12px] py-[20px] px-[40px] flex flex-col gap-[8px] items-center">
+                        @foreach ($layers as $layer)
+                            @php
+                                $isLong    = (float) $layer->angle == 0.0;
+                                $bg        = $isLong ? '#E8C9A0' : '#B8824A';
+                                $textCol   = $isLong ? 'text-gray-800' : 'text-white';
+                                $heightPx  = 28 + (int) round(((float) $layer->thickness / $maxThickness) * 36);
+                                $widthPct  = 50 + (int) round(((float) $layer->width / $maxWidth) * 50);
+                            @endphp
+                            <div class="rounded-[6px] flex items-center justify-between px-[16px] shadow-sm"
+                                 style="background-color: {{ $bg }}; height: {{ $heightPx }}px; width: {{ $widthPct }}%;">
+                                <span class="font-bold text-[13px] {{ $textCol }}">
+                                    L{{ $layer->layer_order }} ({{ rtrim(rtrim(number_format((float) $layer->thickness, 2), '0'), '.') }}mm)
+                                </span>
+                                @if ($isLong)
+                                    <x-lucide-arrow-up class="w-4 h-4 {{ $textCol }}" />
+                                @else
+                                    <x-lucide-rotate-cw class="w-4 h-4 {{ $textCol }}" />
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+        </div>
+
+        <div class="flex-1 min-w-0 rounded-[8px] bg-white border border-gray-200 overflow-hidden order-1">
+            <div class="flex justify-between items-center px-[20px] py-[16px] border-b border-gray-200">
+                <h2 class="font-bold text-[16px] text-gray-900">Layer Composition</h2>
+                <button type="button" x-data="" x-on:click="$dispatch('open-modal', 'add-layer')"
+                        class="flex items-center gap-[4px] text-[14px] font-semibold text-[#3F7A5C] hover:text-[#356a4f]">
+                    <x-lucide-plus class="w-4 h-4" />
+                    Add Layer
+                </button>
+            </div>
             <table class="w-full text-left text-[14px]">
                 <thead class="bg-gray-50 text-gray-600 text-[12px] uppercase">
                     <tr>
@@ -187,8 +249,8 @@
                                           x-on:submit="submitting = true">
                                         @csrf
                                         @method('DELETE')
-                                        <h2 class="text-[18px] font-bold text-gray-900">Delete layer?</h2>
-                                        <p class="mt-[8px] text-[14px] text-gray-600">
+                                        <h2 class="text-[18px] font-bold text-gray-900 dark:text-gray-100">Delete layer?</h2>
+                                        <p class="mt-[8px] text-[14px] text-gray-600 dark:text-gray-200">
                                             This will permanently delete layer
                                             <span class="font-semibold">#{{ $layer->layer_order }}</span>.
                                             This cannot be undone.
@@ -196,7 +258,7 @@
                                         <div class="flex justify-end gap-[8px] mt-[20px]">
                                             <button type="button" x-on:click="$dispatch('close-modal', 'delete-layer-{{ $layer->id }}')"
                                                     :disabled="submitting"
-                                                    class="px-[16px] py-[8px] rounded-[8px] border border-gray-300 text-[14px] text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                                                    class="px-[16px] py-[8px] rounded-[8px] border border-gray-300 text-[14px] text-gray-700 dark:text-gray-100 dark:hover:text-gray-700 transition-all duration-250 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                                                 Cancel
                                             </button>
                                             <button type="submit"
@@ -218,6 +280,7 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
         </div>
 
 
