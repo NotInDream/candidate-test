@@ -82,16 +82,24 @@
                   x-data="{
                       submitting: false,
                       dragging: false,
-                      fileName: '',
+                      fileName: @js(session('staged_file_name', '')),
+                      stagedToken: @js(session('staged_file_token', '')),
                       handleFiles(files) {
                           if (files.length > 0) {
                               this.fileName = files[0].name;
+                              this.stagedToken = '';
                               this.$refs.fileInput.files = files;
                           }
+                      },
+                      clearStaged() {
+                          this.fileName = '';
+                          this.stagedToken = '';
+                          this.$refs.fileInput.value = '';
                       }
                   }"
                   x-on:submit="submitting = true">
                 @csrf
+                <input type="hidden" name="staged_token" :value="stagedToken">
 
                 <div class="px-[24px] pt-[24px] pb-[16px] flex justify-between items-center border-b border-gray-200">
                     <h2 class="text-[18px] font-bold text-gray-900 dark:text-gray-100">Import Layup Data</h2>
@@ -107,10 +115,11 @@
                            x-on:dragover.prevent="dragging = true"
                            x-on:dragleave.prevent="dragging = false"
                            x-on:drop.prevent="dragging = false; handleFiles($event.dataTransfer.files)">
-                        <input id="import-file" name="file" type="file" required
+                        <input id="import-file" name="file" type="file"
+                               :required="!stagedToken"
                                accept=".json,.csv,application/json,text/csv"
                                x-ref="fileInput"
-                               x-on:change="fileName = $event.target.files[0]?.name ?? ''"
+                               x-on:change="if ($event.target.files[0]) { fileName = $event.target.files[0].name; stagedToken = ''; }"
                                class="sr-only">
                         <div class="w-[48px] h-[48px] mx-auto rounded-full border border-[#3F7A5C]/40 flex items-center justify-center">
                             <x-lucide-cloud-upload class="w-6 h-6 text-[#3F7A5C]" />
@@ -119,9 +128,18 @@
                             <span class="text-[#3F7A5C] font-bold">Click to upload</span> or drag and drop
                         </p>
                         <p class="text-[12px] text-gray-500 mt-[4px]">CSV or JSON up to 10MB</p>
-                        <p x-show="fileName" x-cloak x-text="fileName"
-                           class="mt-[10px] text-[12px] font-mono text-gray-700 dark:text-gray-300"></p>
+                        <p x-show="fileName" x-cloak
+                           class="mt-[10px] text-[12px] font-mono text-gray-700 dark:text-gray-300">
+                            <span x-text="fileName"></span>
+                            <span x-show="stagedToken" class="ml-[6px] text-[#3F7A5C]">(from previous dry run)</span>
+                        </p>
                     </label>
+                    <div x-show="stagedToken" x-cloak class="flex justify-end">
+                        <button type="button" x-on:click.stop.prevent="clearStaged()"
+                                class="text-[12px] text-gray-500 hover:text-red-600 underline">
+                            Clear staged file
+                        </button>
+                    </div>
                     <x-input-error :messages="$errors->get('file')" />
 
                     {{-- Strategy --}}

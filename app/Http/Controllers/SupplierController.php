@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateSupplierRequest;
 use App\Models\Suppliers;
 use App\Services\SupplierImportService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use RuntimeException;
@@ -65,13 +66,30 @@ class SupplierController extends Controller
 
     public function import(ImportSupplierRequest $request, Suppliers $supplier, SupplierImportService $importer): RedirectResponse
     {
-        $json     = (string) file_get_contents($request->file('file')->getRealPath());
         $strategy = $request->string('strategy')->toString();
         $dryRun   = $request->boolean('dry_run');
+
+        $staged = $this->readStagedImport($supplier, $request->string('staged_token')->toString() ?: null);
+
+        if ($request->hasFile('file')) {
+            $json         = (string) file_get_contents($request->file('file')->getRealPath());
+            $filename     = $request->file('file')->getClientOriginalName();
+            $reusedStage  = false;
+        } elseif ($staged !== null) {
+            $json        = $staged['contents'];
+            $filename    = $staged['name'];
+            $reusedStage = true;
+        } else {
+            return redirect()
+                ->route('suppliers.show', $supplier)
+                ->withErrors(['file' => 'Please choose a file to import.'])
+                ->with('reopen_import', true);
+        }
 
         try {
             $summary = $importer->import($supplier, $json, $strategy, $dryRun);
         } catch (RuntimeException $e) {
+            $this->clearStagedImport($supplier);
             return redirect()
                 ->route('suppliers.show', $supplier)
                 ->withErrors(['file' => $e->getMessage()])
@@ -83,6 +101,19 @@ class SupplierController extends Controller
         if (!empty($summary['conflicts'])) {
             $redirect->with('import_conflicts', $summary['conflicts'])
                      ->with('reopen_import', true);
+        }
+
+        // Persist the file across requests when nothing was actually written,
+        // so the user doesn't need to re-upload after a dry run or rejection.
+        if (!$summary['applied']) {
+            $token = $reusedStage
+                ? $staged['token']
+                : $this->writeStagedImport($supplier, $json, $filename);
+            $redirect->with('staged_file_token', $token)
+                     ->with('staged_file_name', $filename)
+                     ->with('reopen_import', true);
+        } else {
+            $this->clearStagedImport($supplier);
         }
 
         if ($strategy === SupplierImportService::STRATEGY_REJECT && !$summary['applied']) {
@@ -132,5 +163,60 @@ class SupplierController extends Controller
         }, $filename, [
             'Content-Type' => 'application/json',
         ]);
+    }
+
+    private function stagedSessionKey(Suppliers $supplier): string
+    {
+        return "import_staging.{$supplier->id}";
+    }
+
+    /**
+     * @return array{token:string,name:string,contents:string}|null
+     */
+    private function readStagedImport(Suppliers $supplier, ?string $token): ?array
+    {
+        if ($token === null || $token === '') {
+            return null;
+        }
+
+        $entry = session($this->stagedSessionKey($supplier));
+        if (!is_array($entry) || ($entry['token'] ?? null) !== $token) {
+            return null;
+        }
+        if (!Storage::disk('local')->exists($entry['path'])) {
+            return null;
+        }
+
+        return [
+            'token'    => $entry['token'],
+            'name'     => $entry['name'],
+            'contents' => (string) Storage::disk('local')->get($entry['path']),
+        ];
+    }
+
+    private function writeStagedImport(Suppliers $supplier, string $json, string $name): string
+    {
+        $this->clearStagedImport($supplier);
+
+        $token = Str::random(40);
+        $path  = "import-staging/{$supplier->id}/{$token}.json";
+        Storage::disk('local')->put($path, $json);
+
+        session([$this->stagedSessionKey($supplier) => [
+            'token' => $token,
+            'name'  => $name,
+            'path'  => $path,
+        ]]);
+
+        return $token;
+    }
+
+    private function clearStagedImport(Suppliers $supplier): void
+    {
+        $entry = session($this->stagedSessionKey($supplier));
+        if (is_array($entry) && Storage::disk('local')->exists($entry['path'] ?? '')) {
+            Storage::disk('local')->delete($entry['path']);
+        }
+        session()->forget($this->stagedSessionKey($supplier));
     }
 }
