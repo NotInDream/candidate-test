@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\CLT_Layers;
 use App\Models\CLT_Layups;
 use App\Models\Suppliers;
 use Illuminate\Support\Facades\DB;
@@ -137,7 +136,7 @@ class SupplierImportService
 
                 $differs = ((float) $existingLayer->thickness !== (float) $incomingLayer['thickness'])
                     || ((float) $existingLayer->width !== (float) $incomingLayer['width'])
-                    || ((int) $existingLayer->angle !== (int) $incomingLayer['angle']);
+                    || ((float) $existingLayer->angle !== (float) $incomingLayer['angle']);
 
                 if ($differs) {
                     $conflicts[] = sprintf(
