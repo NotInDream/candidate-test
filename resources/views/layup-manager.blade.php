@@ -217,7 +217,7 @@
             </form>
         </x-modal>
 
-        <x-form-modal name="add-layup" title="Add Layup" :action="route('layups.store', $supplier)" submit-label="Create" :show="$errors->any() && !old('_layup_id')">
+        <x-form-modal name="add-layup" title="Add Layup" :action="route('layups.store', $supplier)" submit-label="Create" :show="$errors->has('name') && !old('_layup_id') && !session('reopen_import')">
             <div class="text-left">
                 <x-input-label for="layup-name" value="Name" />
                 <x-text-input id="layup-name" name="name" type="text" class="mt-1 block w-full"

@@ -122,14 +122,117 @@ class SupplierController extends Controller
         }
 
         $message = sprintf(
-            '%sLayups: %d created, %d updated, %d skipped, %d duplicated. Layers: %d created, %d updated.',
+            '%sLayups: %d created, %d updated. Layers: %d created, %d updated, %d skipped, %d duplicated.',
             $dryRun ? 'Dry run — nothing was saved. ' : 'Import complete. ',
             $summary['created_layups'],
             $summary['updated_layups'],
-            $summary['skipped_layups'],
-            $summary['duplicated_layups'],
             $summary['created_layers'],
             $summary['updated_layers'],
+            $summary['skipped_layers'],
+            $summary['duplicated_layers'],
+        );
+
+        return $redirect->with('status', $message);
+    }
+
+    public function exportAll(): StreamedResponse
+    {
+        $suppliers = Suppliers::with(['layups.layers' => function ($query) {
+            $query->orderBy('layer_order');
+        }])->orderBy('id')->get();
+
+        $payload = [
+            'type' => SupplierImportService::EXPORT_TYPE_SUPPLIERS,
+            'suppliers' => $suppliers->map(fn ($supplier) => [
+                'name' => $supplier->name,
+                'layups' => $supplier->layups->map(fn ($layup) => [
+                    'name' => $layup->name,
+                    'layers' => $layup->layers->map(fn ($layer) => [
+                        'layer_order' => $layer->layer_order,
+                        'thickness' => $layer->thickness,
+                        'width' => $layer->width,
+                        'angle' => $layer->angle,
+                    ])->values(),
+                ])->values(),
+            ])->values(),
+        ];
+
+        $filename = sprintf('suppliers-%s.json', now()->format('Ymd-His'));
+
+        return response()->streamDownload(function () use ($payload) {
+            echo json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        }, $filename, [
+            'Content-Type' => 'application/json',
+        ]);
+    }
+
+    public function importAll(ImportSupplierRequest $request, SupplierImportService $importer): RedirectResponse
+    {
+        $strategy = $request->string('strategy')->toString();
+        $dryRun = $request->boolean('dry_run');
+
+        $staged = $this->readStagedImportAll($request->string('staged_token')->toString() ?: null);
+
+        if ($request->hasFile('file')) {
+            $json = (string) file_get_contents($request->file('file')->getRealPath());
+            $filename = $request->file('file')->getClientOriginalName();
+            $reusedStage = false;
+        } elseif ($staged !== null) {
+            $json = $staged['contents'];
+            $filename = $staged['name'];
+            $reusedStage = true;
+        } else {
+            return redirect()
+                ->route('suppliers.index')
+                ->withErrors(['file' => 'Please choose a file to import.'])
+                ->with('reopen_import_all', true);
+        }
+
+        try {
+            $summary = $importer->importAll($json, $strategy, $dryRun);
+        } catch (RuntimeException $e) {
+            $this->clearStagedImportAll();
+
+            return redirect()
+                ->route('suppliers.index')
+                ->withErrors(['file' => $e->getMessage()])
+                ->with('reopen_import_all', true);
+        }
+
+        $redirect = redirect()->route('suppliers.index');
+
+        if (! empty($summary['conflicts'])) {
+            $redirect->with('import_conflicts', $summary['conflicts']);
+            if (! $summary['applied']) {
+                $redirect->with('reopen_import_all', true);
+            }
+        }
+
+        if (! $summary['applied']) {
+            $token = $reusedStage
+                ? $staged['token']
+                : $this->writeStagedImportAll($json, $filename);
+            $redirect->with('staged_file_token', $token)
+                ->with('staged_file_name', $filename)
+                ->with('reopen_import_all', true);
+        } else {
+            $this->clearStagedImportAll();
+        }
+
+        if ($strategy === SupplierImportService::STRATEGY_REJECT && ! $summary['applied']) {
+            return $redirect->with('status', 'Import rejected: conflicts detected.');
+        }
+
+        $message = sprintf(
+            '%sSuppliers: %d created. Layups: %d created, %d updated. Layers: %d created, %d updated, %d skipped, %d duplicated.',
+            $dryRun ? 'Dry run — nothing was saved. ' : 'Import complete. ',
+            $summary['created_suppliers'],
+            $summary['created_layups'],
+            $summary['updated_layups'],
+            $summary['created_layers'],
+            $summary['updated_layers'],
+            $summary['skipped_layers'],
+            $summary['duplicated_layers'],
         );
 
         return $redirect->with('status', $message);
@@ -142,6 +245,7 @@ class SupplierController extends Controller
         }]);
 
         $payload = [
+            'type' => SupplierImportService::EXPORT_TYPE_LAYUPS,
             'layups' => $supplier->layups->map(fn ($layup) => [
                 'name' => $layup->name,
                 'layers' => $layup->layers->map(fn ($layer) => [
@@ -219,5 +323,60 @@ class SupplierController extends Controller
             Storage::disk('local')->delete($entry['path']);
         }
         session()->forget($this->stagedSessionKey($supplier));
+    }
+
+    private function stagedAllSessionKey(): string
+    {
+        return 'import_staging.all';
+    }
+
+    /**
+     * @return array{token:string,name:string,contents:string}|null
+     */
+    private function readStagedImportAll(?string $token): ?array
+    {
+        if ($token === null || $token === '') {
+            return null;
+        }
+
+        $entry = session($this->stagedAllSessionKey());
+        if (! is_array($entry) || ($entry['token'] ?? null) !== $token) {
+            return null;
+        }
+        if (! Storage::disk('local')->exists($entry['path'])) {
+            return null;
+        }
+
+        return [
+            'token' => $entry['token'],
+            'name' => $entry['name'],
+            'contents' => (string) Storage::disk('local')->get($entry['path']),
+        ];
+    }
+
+    private function writeStagedImportAll(string $json, string $name): string
+    {
+        $this->clearStagedImportAll();
+
+        $token = Str::random(40);
+        $path = "import-staging/all/{$token}.json";
+        Storage::disk('local')->put($path, $json);
+
+        session([$this->stagedAllSessionKey() => [
+            'token' => $token,
+            'name' => $name,
+            'path' => $path,
+        ]]);
+
+        return $token;
+    }
+
+    private function clearStagedImportAll(): void
+    {
+        $entry = session($this->stagedAllSessionKey());
+        if (is_array($entry) && Storage::disk('local')->exists($entry['path'] ?? '')) {
+            Storage::disk('local')->delete($entry['path']);
+        }
+        session()->forget($this->stagedAllSessionKey());
     }
 }

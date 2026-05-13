@@ -13,6 +13,8 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/suppliers', [SupplierController::class, 'index'])->name('suppliers.index');
     Route::post('/suppliers', [SupplierController::class, 'store'])->name('suppliers.store');
+    Route::get('/suppliers-export-all', [SupplierController::class, 'exportAll'])->name('suppliers.exportAll');
+    Route::post('/suppliers-import-all', [SupplierController::class, 'importAll'])->name('suppliers.importAll');
     Route::get('/suppliers/{supplier}', [SupplierController::class, 'show'])->name('suppliers.show');
     Route::get('/suppliers/{supplier}/export', [SupplierController::class, 'export'])->name('suppliers.export');
     Route::post('/suppliers/{supplier}/import', [SupplierController::class, 'import'])->name('suppliers.import');
