@@ -26,7 +26,7 @@ class CLT_Layups extends Model
         return $this->belongsTo(Suppliers::class, 'supplier_id');
     }
 
-    public function layers() : HasMany
+    public function layers(): HasMany
     {
         return $this->hasMany(CLT_Layers::class, 'layup_id');
     }

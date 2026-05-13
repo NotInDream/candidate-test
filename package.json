@@ -3,7 +3,9 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "vite"
+        "dev": "vite",
+        "format": "prettier --write \"resources/views/**/*.blade.php\"",
+        "format:check": "prettier --check \"resources/views/**/*.blade.php\""
     },
     "devDependencies": {
         "@shufo/prettier-plugin-blade": "^1.16.2",

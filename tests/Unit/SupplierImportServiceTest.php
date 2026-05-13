@@ -14,12 +14,13 @@ class SupplierImportServiceTest extends TestCase
     use RefreshDatabase;
 
     private SupplierImportService $service;
+
     private Suppliers $supplier;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service  = new SupplierImportService();
+        $this->service = new SupplierImportService;
         $this->supplier = Suppliers::factory()->create();
     }
 
@@ -32,7 +33,7 @@ class SupplierImportServiceTest extends TestCase
     {
         $json = $this->payload([
             [
-                'name'   => 'Standard 3-Ply',
+                'name' => 'Standard 3-Ply',
                 'layers' => [
                     ['layer_order' => 1, 'thickness' => 35, 'width' => 100, 'angle' => 0],
                     ['layer_order' => 2, 'thickness' => 35, 'width' => 100, 'angle' => 90],
@@ -125,7 +126,7 @@ class SupplierImportServiceTest extends TestCase
     public function test_dry_run_rolls_back_changes(): void
     {
         $json = $this->payload([[
-            'name'   => 'Dry-Run Only',
+            'name' => 'Dry-Run Only',
             'layers' => [
                 ['layer_order' => 1, 'thickness' => 35, 'width' => 100, 'angle' => 0],
             ],

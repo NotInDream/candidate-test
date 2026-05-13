@@ -10,9 +10,12 @@ use RuntimeException;
 class SupplierImportService
 {
     public const STRATEGY_OVERWRITE = 'overwrite';
-    public const STRATEGY_SKIP      = 'skip';
+
+    public const STRATEGY_SKIP = 'skip';
+
     public const STRATEGY_DUPLICATE = 'duplicate';
-    public const STRATEGY_REJECT    = 'reject';
+
+    public const STRATEGY_REJECT = 'reject';
 
     public const STRATEGIES = [
         self::STRATEGY_OVERWRITE,
@@ -30,25 +33,25 @@ class SupplierImportService
      */
     public function import(Suppliers $supplier, string $json, string $strategy, bool $dryRun = false): array
     {
-        if (!in_array($strategy, self::STRATEGIES, true)) {
+        if (! in_array($strategy, self::STRATEGIES, true)) {
             throw new RuntimeException("Unknown strategy: {$strategy}");
         }
 
         $data = $this->decode($json);
 
         $summary = [
-            'created_layups'    => 0,
-            'updated_layups'    => 0,
-            'skipped_layups'    => 0,
+            'created_layups' => 0,
+            'updated_layups' => 0,
+            'skipped_layups' => 0,
             'duplicated_layups' => 0,
-            'created_layers'    => 0,
-            'updated_layers'    => 0,
-            'conflicts'         => $this->detectConflicts($supplier, $data['layups']),
-            'dry_run'           => $dryRun,
-            'applied'           => false,
+            'created_layers' => 0,
+            'updated_layers' => 0,
+            'conflicts' => $this->detectConflicts($supplier, $data['layups']),
+            'dry_run' => $dryRun,
+            'applied' => false,
         ];
 
-        if ($strategy === self::STRATEGY_REJECT && !empty($summary['conflicts'])) {
+        if ($strategy === self::STRATEGY_REJECT && ! empty($summary['conflicts'])) {
             return $summary;
         }
 
@@ -59,14 +62,15 @@ class SupplierImportService
 
                 if ($existing === null) {
                     $this->createLayup($supplier, $incomingLayup, $summary);
+
                     continue;
                 }
 
                 match ($strategy) {
                     self::STRATEGY_OVERWRITE => $this->overwriteLayup($existing, $incomingLayup, $summary),
-                    self::STRATEGY_SKIP      => $summary['skipped_layups']++,
+                    self::STRATEGY_SKIP => $summary['skipped_layups']++,
                     self::STRATEGY_DUPLICATE => $this->duplicateLayup($supplier, $incomingLayup, $summary),
-                    self::STRATEGY_REJECT    => null,
+                    self::STRATEGY_REJECT => null,
                 };
             }
 
@@ -90,18 +94,18 @@ class SupplierImportService
     private function decode(string $json): array
     {
         $decoded = json_decode($json, true);
-        if (!is_array($decoded)) {
+        if (! is_array($decoded)) {
             throw new RuntimeException('Invalid JSON file.');
         }
-        if (!isset($decoded['layups']) || !is_array($decoded['layups'])) {
+        if (! isset($decoded['layups']) || ! is_array($decoded['layups'])) {
             throw new RuntimeException('Missing "layups" array in import file.');
         }
 
         foreach ($decoded['layups'] as $i => $layup) {
-            if (!isset($layup['name']) || !is_string($layup['name'])) {
+            if (! isset($layup['name']) || ! is_string($layup['name'])) {
                 throw new RuntimeException("Layup at index {$i} is missing a name.");
             }
-            if (!isset($layup['layers']) || !is_array($layup['layers'])) {
+            if (! isset($layup['layers']) || ! is_array($layup['layers'])) {
                 throw new RuntimeException("Layup '{$layup['name']}' is missing a layers array.");
             }
         }
@@ -179,8 +183,8 @@ class SupplierImportService
 
             $attributes = [
                 'thickness' => $incomingLayer['thickness'],
-                'width'     => $incomingLayer['width'],
-                'angle'     => $incomingLayer['angle'],
+                'width' => $incomingLayer['width'],
+                'angle' => $incomingLayer['angle'],
             ];
 
             if ($existingLayer === null) {
@@ -199,9 +203,9 @@ class SupplierImportService
      */
     private function duplicateLayup(Suppliers $supplier, array $incoming, array &$summary): void
     {
-        $baseName = $incoming['name'] . ' (imported)';
-        $name     = $baseName;
-        $i        = 2;
+        $baseName = $incoming['name'].' (imported)';
+        $name = $baseName;
+        $i = 2;
         while ($supplier->layups()->where('name', $name)->exists()) {
             $name = "{$baseName} {$i}";
             $i++;
@@ -221,12 +225,13 @@ class SupplierImportService
         foreach ($layers as $layer) {
             $layup->layers()->create([
                 'layer_order' => $layer['layer_order'],
-                'thickness'   => $layer['thickness'],
-                'width'       => $layer['width'],
-                'angle'       => $layer['angle'],
+                'thickness' => $layer['thickness'],
+                'width' => $layer['width'],
+                'angle' => $layer['angle'],
             ]);
             $count++;
         }
+
         return $count;
     }
 }

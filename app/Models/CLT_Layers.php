@@ -11,11 +11,11 @@ class CLT_Layers extends Model
     protected $table = 'clt_layers';
 
     protected $fillable = [
-        "layer_order",
-        "thickness",
-        "width",
-        "angle",
-        "layup_id",
+        'layer_order',
+        'thickness',
+        'width',
+        'angle',
+        'layup_id',
     ];
 
     protected static function newFactory()

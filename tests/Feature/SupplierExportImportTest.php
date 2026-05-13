@@ -22,7 +22,7 @@ class SupplierExportImportTest extends TestCase
     public function test_export_returns_json_attachment_with_full_tree(): void
     {
         $supplier = Suppliers::factory()->create(['name' => 'Acme']);
-        $layup    = CLT_Layups::factory()->for($supplier, 'supplier')->create(['name' => 'Standard']);
+        $layup = CLT_Layups::factory()->for($supplier, 'supplier')->create(['name' => 'Standard']);
         $layup->layers()->create(['layer_order' => 1, 'thickness' => 35, 'width' => 100, 'angle' => 0]);
 
         $response = $this->get(route('suppliers.export', $supplier));
@@ -42,7 +42,7 @@ class SupplierExportImportTest extends TestCase
         $json = json_encode([
             'layups' => [
                 [
-                    'name'   => 'Imported Layup',
+                    'name' => 'Imported Layup',
                     'layers' => [
                         ['layer_order' => 1, 'thickness' => 35, 'width' => 100, 'angle' => 0],
                     ],
@@ -51,7 +51,7 @@ class SupplierExportImportTest extends TestCase
         ]);
 
         $response = $this->post(route('suppliers.import', $supplier), [
-            'file'     => UploadedFile::fake()->createWithContent('import.json', $json),
+            'file' => UploadedFile::fake()->createWithContent('import.json', $json),
             'strategy' => 'overwrite',
         ]);
 
@@ -63,7 +63,7 @@ class SupplierExportImportTest extends TestCase
     public function test_import_with_reject_strategy_flashes_conflicts(): void
     {
         $supplier = Suppliers::factory()->create();
-        $layup    = CLT_Layups::factory()->for($supplier, 'supplier')->create(['name' => 'Standard']);
+        $layup = CLT_Layups::factory()->for($supplier, 'supplier')->create(['name' => 'Standard']);
         $layup->layers()->create(['layer_order' => 1, 'thickness' => 30, 'width' => 100, 'angle' => 0]);
 
         $json = json_encode([
@@ -75,7 +75,7 @@ class SupplierExportImportTest extends TestCase
         ]);
 
         $this->post(route('suppliers.import', $supplier), [
-            'file'     => UploadedFile::fake()->createWithContent('import.json', $json),
+            'file' => UploadedFile::fake()->createWithContent('import.json', $json),
             'strategy' => 'reject',
         ])->assertSessionHas('import_conflicts');
 
@@ -95,9 +95,9 @@ class SupplierExportImportTest extends TestCase
         ]);
 
         $this->post(route('suppliers.import', $supplier), [
-            'file'     => UploadedFile::fake()->createWithContent('import.json', $json),
+            'file' => UploadedFile::fake()->createWithContent('import.json', $json),
             'strategy' => 'overwrite',
-            'dry_run'  => '1',
+            'dry_run' => '1',
         ])->assertRedirect();
 
         $this->assertSame(0, $supplier->layups()->count());
@@ -110,7 +110,7 @@ class SupplierExportImportTest extends TestCase
 
         $this->from(route('suppliers.show', $supplier))
             ->post(route('suppliers.import', $supplier), [
-                'file'     => UploadedFile::fake()->createWithContent('import.json', $json),
+                'file' => UploadedFile::fake()->createWithContent('import.json', $json),
                 'strategy' => 'invalid-strategy',
             ])
             ->assertSessionHasErrors('strategy');

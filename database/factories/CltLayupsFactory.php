@@ -17,7 +17,7 @@ class CltLayupsFactory extends Factory
     {
         return [
             'supplier_id' => Suppliers::factory(),
-            'name'        => fake()->unique()->words(3, true),
+            'name' => fake()->unique()->words(3, true),
         ];
     }
 }

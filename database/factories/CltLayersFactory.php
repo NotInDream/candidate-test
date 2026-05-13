@@ -18,11 +18,11 @@ class CltLayersFactory extends Factory
         static $order = 0;
 
         return [
-            'layup_id'    => CLT_Layups::factory(),
+            'layup_id' => CLT_Layups::factory(),
             'layer_order' => ++$order,
-            'thickness'   => fake()->numberBetween(20, 80),
-            'width'       => fake()->numberBetween(80, 200),
-            'angle'       => fake()->randomElement([0, 45, 90, -45]),
+            'thickness' => fake()->numberBetween(20, 80),
+            'width' => fake()->numberBetween(80, 200),
+            'angle' => fake()->randomElement([0, 45, 90, -45]),
         ];
     }
 }

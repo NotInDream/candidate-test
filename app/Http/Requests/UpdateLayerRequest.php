@@ -29,8 +29,8 @@ class UpdateLayerRequest extends FormRequest
                     ->ignore($layer),
             ],
             'thickness' => ['required', 'numeric', 'min:0'],
-            'width'     => ['required', 'numeric', 'min:0'],
-            'angle'     => ['required', 'numeric', 'between:-180,180'],
+            'width' => ['required', 'numeric', 'min:0'],
+            'angle' => ['required', 'numeric', 'between:-180,180'],
         ];
     }
 }

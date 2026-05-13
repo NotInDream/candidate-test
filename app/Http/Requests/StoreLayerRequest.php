@@ -27,8 +27,8 @@ class StoreLayerRequest extends FormRequest
                 Rule::unique('clt_layers', 'layer_order')->where('layup_id', $layupId),
             ],
             'thickness' => ['required', 'numeric', 'min:0'],
-            'width'     => ['required', 'numeric', 'min:0'],
-            'angle'     => ['required', 'numeric', 'between:-180,180'],
+            'width' => ['required', 'numeric', 'min:0'],
+            'angle' => ['required', 'numeric', 'between:-180,180'],
         ];
     }
 }

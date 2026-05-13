@@ -19,10 +19,10 @@ class ImportSupplierRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'file'         => ['required_without:staged_token', 'nullable', 'file', 'mimes:json,txt', 'max:10240'],
+            'file' => ['required_without:staged_token', 'nullable', 'file', 'mimes:json,txt', 'max:10240'],
             'staged_token' => ['nullable', 'string', 'max:64'],
-            'strategy'     => ['required', Rule::in(SupplierImportService::STRATEGIES)],
-            'dry_run'      => ['nullable', 'boolean'],
+            'strategy' => ['required', Rule::in(SupplierImportService::STRATEGIES)],
+            'dry_run' => ['nullable', 'boolean'],
         ];
     }
 }

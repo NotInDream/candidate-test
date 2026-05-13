@@ -26,8 +26,8 @@ class LayupController extends Controller
 
         return view('layer-manager', [
             'supplier' => $supplier,
-            'layup'    => $layup,
-            'layers'   => $layers,
+            'layup' => $layup,
+            'layers' => $layers,
         ]);
     }
 

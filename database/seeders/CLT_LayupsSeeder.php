@@ -19,7 +19,7 @@ class CLT_LayupsSeeder extends Seeder
             ['supplier_id' => 1, 'name' => 'Standard 3-Ply Wall'],
             ['supplier_id' => 1, 'name' => 'Heavy Floor Panel'],
             ['supplier_id' => 1, 'name' => 'Custom Span Beam'],
-            ['supplier_id' => 1, 'name' => 'Standard 3-Ply Floor']
+            ['supplier_id' => 1, 'name' => 'Standard 3-Ply Floor'],
         ];
 
         foreach ($layups as $layup) {

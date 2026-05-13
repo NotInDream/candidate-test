@@ -15,6 +15,7 @@ class SupplierCrudTest extends TestCase
     {
         $user = User::factory()->create();
         $this->actingAs($user);
+
         return $user;
     }
 
